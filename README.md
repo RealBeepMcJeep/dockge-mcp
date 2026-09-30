@@ -8,14 +8,17 @@ are in progress; this repository does not yet contain a working server.
 - [Dockge source and UI review](docs/research/dockge.md)
 - [MCP server guidance](docs/research/mcp.md)
 - [Rust and TypeScript comparison](docs/research/runtime.md)
+- [Selected TypeScript/Bun runtime](docs/research/bun.md)
+- [Initial tool contract](docs/contract.md)
 - [Design interview and open decisions](docs/design.md)
 - [Unsupported-operation examples](docs/unsupported-scenarios.md)
 - [Deferred work](docs/TODO.md)
 - [Domain glossary](GLOSSARY.md)
 
-The intended capabilities include stack discovery, lifecycle actions, editing,
-creation, status, logs, and container-related operations. Exact scope, deployment,
-and execution semantics are being decided with the project owner.
+The selected runtime is TypeScript with Bun. The initial scope follows Dockge
+1.5.0 operational behavior: discovery, stack lifecycle, YAML editing, creation,
+status, bounded logs, and separately authorized `.env` retrieval/modification.
+Shells are deferred. The design interview is settling recovery and packaging.
 
 ## Reference source
 

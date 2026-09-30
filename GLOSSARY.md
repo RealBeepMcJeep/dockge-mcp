@@ -27,3 +27,7 @@ A stack whose directory is available within the managing Dockge instance's stack
 
 **Draft stack**:
 A saved stack that has not been created as a Compose application.
+
+**Stack environment**:
+The stack-specific environment values recorded in its `.env` file.
+_Avoid_: Container environment, global environment

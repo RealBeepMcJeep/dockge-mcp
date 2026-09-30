@@ -1,6 +1,6 @@
 # Unsupported features and uncertain outcomes
 
-Proposal for Q8; not yet accepted by the owner. Distinguish a feature that the
+Accepted policy for Q8 after the owner reviewed these scenarios. Distinguish a feature that the
 known backend lacks from a request whose outcome is unknown after dispatch.
 
 | Scenario | Proposed response | Suggested next action |

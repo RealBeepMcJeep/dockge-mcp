@@ -1,8 +1,9 @@
 # Runtime comparison: Rust and TypeScript
 
-Research on 2026-09-30 for Q12. No runtime has been selected, no toolchain has
-been installed, and no implementation spike has been run. The owner prefers a
-single-file executable and few installed dependencies.
+Research on 2026-09-30 for Q12. The owner subsequently selected
+JavaScript/TypeScript with Bun; the Rust proposal below was not accepted. No
+toolchain has been installed and no implementation spike has been run. This
+comparison records why standalone Rust packaging was considered.
 
 ## Rust fits the packaging preference
 
@@ -65,7 +66,7 @@ supports the current hub baseline. Deployment requires Node or a packaging
 strategy that embeds it; a container hides the install steps but does not remove
 the runtime. That conflicts with the owner's preferred standalone distribution.
 
-## Proposed choice and validation
+## Earlier proposal, not selected
 
 Given the owner's preference, propose Rust with a standalone executable and a
 Docker image wrapping it. The first implementation milestone should prove

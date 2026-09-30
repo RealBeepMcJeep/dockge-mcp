@@ -14,8 +14,10 @@
 
 ## Verification before a supported deployment
 
-- If Rust is selected, first prove Socket.IO ACK/event/reconnect behavior, legacy
-  MCP HTTP compatibility, and standalone/static binary packaging on fixtures.
+- Verify the TypeScript MCP SDK's legacy Streamable HTTP behavior and official
+  Socket.IO client's ACK/event/reconnect handling under the selected Bun runtime.
+- Verify environment read/write permission isolation and preservation of `.env`
+  during general YAML saves/deployment; include concurrent changes/partial writes.
 - Obtain the primary Dockge URL through configuration; verify its actual release
   or image/source fingerprint. Its reported 1.5.0 version is insufficient alone.
 - Verify Dockge authentication and registered-agent routing on a read-only path.
