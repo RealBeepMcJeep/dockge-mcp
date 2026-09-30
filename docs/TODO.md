@@ -14,8 +14,8 @@
 
 ## Verification before a supported deployment
 
-- Choose the public GitHub owner and source/mirror direction; configure GitHub
-  access and automatic builds/releases. Make GHCR package public and verify
+- Configure GitHub access for `realbeepmcjeep/dockge-mcp`, a one-way Gitea push
+  mirror, and automatic builds/releases. Make GHCR package public and verify
   anonymous pulls after first publication. See publishing.md.
 - Verify compiled x64/arm64 executables and multi-platform image through public
   CI, with no production Dockge credentials.

@@ -1,7 +1,7 @@
 # Dockge MCP
 
-A proposed MCP server for managing Dockge stacks. Research and a design interview
-are in progress; this repository does not yet contain a working server.
+A planned MCP server for managing Dockge stacks. Architecture is settled and
+awaiting final shared-understanding confirmation; there is no working server yet.
 
 ## Project notes
 
@@ -11,7 +11,9 @@ are in progress; this repository does not yet contain a working server.
 - [Selected TypeScript/Bun runtime](docs/research/bun.md)
 - [Initial tool contract](docs/contract.md)
 - [GitHub Actions and GHCR publishing](docs/publishing.md)
-- [Design interview and open decisions](docs/design.md)
+- [Owner's public build examples](docs/research/public-build-examples.md)
+- [Implementation plan](docs/implementation-plan.md)
+- [Design interview and accepted decisions](docs/design.md)
 - [Unsupported-operation examples](docs/unsupported-scenarios.md)
 - [Deferred work](docs/TODO.md)
 - [Domain glossary](GLOSSARY.md)
@@ -21,7 +23,8 @@ The selected runtime is TypeScript with Bun. The initial scope follows Dockge
 status, bounded logs, and separately authorized `.env` retrieval/modification.
 Shells are deferred. Durable operation recovery and Linux x64/arm64 Docker/binary
 packaging are selected. Public GitHub Actions will publish images to GHCR; the
-design interview is settling GitHub ownership and mirror direction.
+public mirror will be `realbeepmcjeep/dockge-mcp`, with Gitea authoritative.
+The architectural interview is complete; final design confirmation is pending.
 
 ## Reference source
 

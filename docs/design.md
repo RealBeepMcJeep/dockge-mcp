@@ -1,7 +1,7 @@
 # Design interview
 
-Status: round 4 accepted (2026-09-30); GitHub publishing adds two open questions. Unanswered
-recommendations remain proposals. The invoked `grill-with-docs` skill combines an interview
+Status: architectural interview settled (2026-09-30); final shared-understanding
+confirmation pending. The invoked `grill-with-docs` skill combines an interview
 with glossary and ADR updates. Implementation begins after shared understanding
 is confirmed; repository creation and research were separately authorized.
 
@@ -15,7 +15,8 @@ is confirmed; repository creation and research were separately authorized.
 
 The Gitea repository starts private, matching the organization visibility.
 MIT licensing, public GitHub Actions builds, and GHCR distribution are now
-accepted. GitHub ownership and source/mirror direction remain open.
+accepted. Public GitHub owner is `realbeepmcjeep`; Gitea remains authoritative
+with a one-way push mirror to GitHub.
 
 ## Round 1: accepted
 
@@ -90,22 +91,22 @@ credentials should be supplied through configuration, not pasted into the chat.
 | Q21: Distribution artifacts? | Docker image first, plus a compiled Bun executable; initially test Linux x64/arm64. | Accepted; add public GitHub Actions automatic builds and GHCR publishing. |
 | Q22: License? | MIT. Runtime changes did not settle the earlier license question. | Accepted |
 
-## GitHub publishing frontier
+## GitHub publishing: accepted
 
 | Question | Recommendation | Owner's answer |
 | --- | --- | --- |
-| GitHub owner for public dockge-mcp and GHCR namespace? | Use the owner's chosen GitHub user/organization; do not infer it from Gitea's organization name. | Pending |
-| Source of truth and mirror direction? | Gitea remains development source; one-way push mirror to public GitHub for Actions/releases. | Pending |
+| GitHub owner for public dockge-mcp and GHCR namespace? | Use the owner's chosen GitHub user/organization; do not infer it from Gitea's organization name. | realbeepmcjeep |
+| Source of truth and mirror direction? | Gitea remains development source; one-way push mirror to public GitHub for Actions/releases. | Accepted |
 
 Configured GitHub credentials and a GitHub CLI were unavailable during read-only
 discovery. Repository/workflow preparation can proceed locally after the final
-design confirmation; publishing/mirror setup needs the chosen owner and GitHub
-access. Use CI's repository-scoped GITHUB_TOKEN for GHCR, not a permanent Docker
+design confirmation; publishing/mirror setup needs GitHub access, which the owner
+will supply later. Use CI's repository-scoped GITHUB_TOKEN for GHCR, not a permanent Docker
 registry token. Exact release policy is documented in publishing.md.
 
 The reviewable tool inventory and accepted semantics are in `contract.md`.
-After this round, summarize the settled design and seek the skill's final shared-
-understanding confirmation. Do not expand this into another round for routine
+Summarize the settled design and seek the skill's final shared-understanding
+confirmation. Do not expand this into another round for routine
 reversible implementation defaults unless a material issue emerges.
 
 Read-only research is checking actual hub/client compatibility and Dockge release
@@ -113,7 +114,7 @@ behavior. The configured `/mcp/paseo-pi` route negotiated MCP 2025-11-25 even wh
 2026-07-28 was requested. No primary Dockge URL was discoverable in available
 workspace/configuration, so live Dockge compatibility still requires its URL.
 Live configuration/verification remains acceptance work. Architecture decisions
-are settled except for the GitHub publishing frontier; shell sharing and advanced
+are settled; shell sharing and advanced
 per-person access stay deferred. Reversible implementation defaults for timeouts,
 payload bounds, and naming will be documented during implementation.
 

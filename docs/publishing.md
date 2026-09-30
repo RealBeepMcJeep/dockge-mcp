@@ -2,18 +2,19 @@
 
 The owner accepted Docker plus compiled Bun executables for Linux x64/arm64,
 MIT licensing, and public GitHub Actions automatic builds/publishing to GHCR.
-The public GitHub owner and repository source/mirror direction remain open.
+The public GitHub owner is `realbeepmcjeep`; Gitea remains authoritative with a
+one-way public GitHub push mirror. GitHub credentials will be supplied later.
 No GitHub repository, workflow, release, or package has been created yet.
 
 ## Destinations
 
 - Development repository exists at Gitea organization `AI-Goes-Fast`, name
   `dockge-mcp`.
-- Public GitHub repository: `<chosen-owner>/dockge-mcp`.
-- Container package: `ghcr.io/<lowercase-chosen-owner>/dockge-mcp`.
+- Public GitHub repository: `realbeepmcjeep/dockge-mcp`.
+- Container package: `ghcr.io/realbeepmcjeep/dockge-mcp`.
 - Binary release assets: Linux x64 and arm64 executables, with checksums.
 
-## Proposed repository flow
+## Accepted repository flow
 
 Keep Gitea authoritative and configure a one-way push mirror to public GitHub.
 [Gitea push mirrors](https://docs.gitea.com/usage/repository/repo-mirror/)
@@ -28,10 +29,15 @@ push code and workflows. Create the public GitHub destination first. Never put
 the mirror credential in code or image layers. The public build runner does not
 need to reach private Gitea or Dockge; source is pushed outward to GitHub.
 
-If the owner selects GitHub as authoritative instead, invert the repository
-flow and adjust contribution instructions. Do not configure both directions.
+Do not configure bidirectional mirroring. GitHub contributions must be brought
+into the Gitea source before mirroring, rather than merged only in GitHub.
 
 ## Proposed build/release policy
+
+The owner's [public build examples](research/public-build-examples.md) provide
+CI gating, Buildx caching, build metadata, MCP smoke, and anonymous-visibility
+conventions. Adapt them for Bun, two architectures, binary release artifacts,
+and the release channels below.
 
 | Trigger | Validation/build | Publication |
 | --- | --- | --- |
@@ -71,8 +77,8 @@ operation ledger, raw environment files, and logs are never release artifacts.
 
 ## Current prerequisites
 
-GitHub owner and mirror direction need answers. No usable GitHub credentials or
-GitHub CLI were found in read-only local discovery. Implementation/workflow
+No usable GitHub credentials or GitHub CLI were found in read-only local
+discovery; the owner will configure access later. Implementation/workflow
 preparation can proceed locally after shared understanding is confirmed, while
 GitHub publication requires configured access. The Gitea repository and accepted
 design records are already committed.
