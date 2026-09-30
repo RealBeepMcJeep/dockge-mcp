@@ -20,6 +20,26 @@ the current revision. Verify the homelab hub and clients before choosing the
 compatibility baseline. Use the SDK rather than implementing JSON-RPC or
 transport negotiation by hand.
 
+## Observed homelab compatibility
+
+Read-only discovery on 2026-09-30 identified the configured MCPHub dashboard as
+the [samanhappy/mcphub](https://github.com/samanhappy/mcphub) software family.
+The existing Codex-configured `/mcp/paseo-pi` route accepted initialization with
+MCP 2025-11-25 and negotiated down to that version when 2026-07-28 was requested.
+It returned a session header. The configured `/mcp/claude` route was not usable
+with environment credentials during discovery; results apply to the tested
+route, not every possible hub route.
+
+The returned serverInfo identifies an upstream name/version and does not prove
+the installed MCPHub application version. No application version was confirmed.
+Recommendation for this deployment: target the tested 2025-11-25 baseline using
+the maintained SDK v1 line initially, then verify actual tool calls through the
+hub. Current v2/new-spec guidance above remains relevant for future upgrades,
+but should not be assumed compatible with this deployment today.
+
+Discovery used configured credentials without printing or copying their values
+into the project. Only read-only initialization/health checks were performed.
+
 ## Transport
 
 [Stdio](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio)

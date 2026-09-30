@@ -4,6 +4,26 @@ Reviewed 2026-09-30 at commit
 `f809ae192b571944ad773e9866d3e67064ae8043`. Links below pin source findings to that
 revision. These are static findings, not live-instance verification.
 
+## Release comparison: critical distinction
+
+Follow-up review of the official
+[1.5.0 release source](https://github.com/louislam/dockge/blob/1.5.0/backend/stack.ts)
+found that it **does persist `.env`**. The missing write discussed below applies
+to the pinned master snapshot, not to released 1.5.0. Release service status
+maps a service to a status string, while master returns arrays of container
+names/statuses. Released 1.5.0 also lacks the master's service start/stop/restart
+methods/handlers or `dockerStats`. Both report package version 1.5.0, so version-string checks
+alone cannot establish supported capabilities. Use tested, explicitly configured
+compatibility profiles and clearly report unsupported features. Shared PTY shell
+limitations remain in the release.
+
+The official [release](https://github.com/louislam/dockge/releases/tag/1.5.0) is
+dated 2025-03-30 and its tag resolves to commit
+`bac498f97ffc33f7ffb2380bd68493de0719f4dd`. No live Dockge URL/version was
+discoverable from the available workspace/configuration. Live-instance support
+remains unverified. Operational parity must refer to a specific UI release,
+rather than including every capability added on unreleased master.
+
 ## Documentation and feasibility
 
 Dockge's [README](https://github.com/louislam/dockge/blob/f809ae192b571944ad773e9866d3e67064ae8043/README.md)

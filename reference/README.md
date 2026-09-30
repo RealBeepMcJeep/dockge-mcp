@@ -20,3 +20,7 @@ git -C reference/dockge checkout --detach f809ae192b571944ad773e9866d3e67064ae80
 The checkout is ignored so our project history does not include a copy of Dockge.
 The implementation must have a declared supported version and protocol fixtures;
 this snapshot alone does not establish compatibility with any live installation.
+
+Follow-up comparison also reviewed official release tag `1.5.0`, commit
+`bac498f97ffc33f7ffb2380bd68493de0719f4dd`, using upstream source URLs. Release
+and master differ despite the same package version; see the source review.
