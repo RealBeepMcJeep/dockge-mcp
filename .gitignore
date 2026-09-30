@@ -1,0 +1,10 @@
+# Local upstream source checkouts, not part of this project's implementation.
+/reference/*/
+
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
