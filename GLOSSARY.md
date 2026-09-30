@@ -1,7 +1,8 @@
 # Dockge management
 
-Terms established by Dockge's documentation and source. Tool names and project
-policy remain part of the design interview.
+Terms established by Dockge's documentation and source. The project follows
+native Dockge UI concepts; runtime and unresolved policies remain in the design
+interview.
 
 ## Language
 

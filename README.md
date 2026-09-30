@@ -7,7 +7,10 @@ are in progress; this repository does not yet contain a working server.
 
 - [Dockge source and UI review](docs/research/dockge.md)
 - [MCP server guidance](docs/research/mcp.md)
+- [Rust and TypeScript comparison](docs/research/runtime.md)
 - [Design interview and open decisions](docs/design.md)
+- [Unsupported-operation examples](docs/unsupported-scenarios.md)
+- [Deferred work](docs/TODO.md)
 - [Domain glossary](GLOSSARY.md)
 
 The intended capabilities include stack discovery, lifecycle actions, editing,
