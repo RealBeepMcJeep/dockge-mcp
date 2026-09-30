@@ -1,7 +1,7 @@
 # Initial tool contract
 
-Design draft on 2026-09-30. Accepted decisions below are separated from remaining
-round-4 proposals. No tools are implemented yet.
+Design contract on 2026-09-30. Operational decisions are accepted; GitHub owner
+and mirror direction remain open. No tools are implemented yet.
 
 ## Baseline and targets
 
@@ -37,6 +37,7 @@ routine implementation choices unless they alter behavior.
 | `get_stack_env` | Retrieve raw stack `.env` content through a dedicated tool requiring `env_read`; not implied by ordinary reads. |
 | `set_stack_env` | Replace stack `.env` through a dedicated tool requiring `env_write`; not implied by ordinary writes. Preserve YAML internally and require a last-read environment revision. |
 | `operation_status`, `operation_logs` | Inspect mutation handles without exposing requested environment content or credentials. Logs are bounded; completion means CLI completion, not readiness. |
+| `resolve_operation` | Explicitly acknowledge and release the stack lock for an unknown operation, without claiming the underlying command succeeded/failed or stopping it. Requires mutation/recovery authority and records a reason. |
 
 Stock release 1.5.0 lacks master-only `startService`, `stopService`,
 `restartService`, and `dockerStats` events. Those are not promised initial tools.
@@ -52,8 +53,9 @@ environment edit requests. No automatic redacted placeholder substitution.
 
 Dedicated environment write need not imply read permission: ordinary metadata
 may provide an opaque environment revision token without its content. The caller
-must supply a full replacement intentionally. Precise defaults and save/deploy
-behavior await Q18/Q20.
+must supply a full replacement intentionally. `env_read` and `env_write` are
+disabled by default and enabled independently. Environment writes save only;
+deploy/start remains a separate operation for applying changed configuration.
 
 Detect stale revisions immediately before dispatch. Serialize bridge mutations
 by agent/stack and verify preserved/changed documents afterward. Dockge UI or
@@ -73,7 +75,12 @@ before dispatch; normally lifecycle ACK follows CLI exit. Never automatically
 retry a mutation whose delivery/completion is uncertain. Deploy/edit failures may
 leave partial changes; expose known effects rather than claiming rollback.
 
-Retention, durable recovery, and clearing unknown-operation locks await Q19.
+Persist operations and stack guards in Bun SQLite. Bounded diagnostic output is
+retained for 24 hours. At process restart, interrupted/in-flight operations become
+unknown and retain their guard until reconciliation establishes completion or an
+operator explicitly clears it. Unknown guards are not silently released because
+logs expired. Persist no raw environment edit requests. Keep unresolved operation
+metadata as long as its guard exists; finite retention applies to resolved history.
 Reasonable finite limits for request sizes, output, and observations will be
 documented implementation defaults; none will silently request infinite follow.
 
@@ -88,3 +95,9 @@ Verify schema/result consistency, Bun HTTP/SSE behavior, ACK/reconnect/routing,
 target isolation, conflicting/uncertain mutations, and environment permission
 separation. Initial live mutation tests use disposable stacks. Existing production
 stacks are not integration-test fixtures.
+
+## Distribution
+
+MIT license. Build a Docker image and compiled Bun executables for Linux x64 and
+arm64. Public GitHub Actions build/publish to GHCR; GitHub owner and mirror
+direction remain to be chosen. See publishing.md for the proposed release policy.

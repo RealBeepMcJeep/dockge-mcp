@@ -32,4 +32,5 @@ TLS, and configuration loading must be tested before making portability claims.
 
 [Built-in SQLite](https://bun.com/docs/runtime/sqlite) offers an operation-ledger
 option without adding a separate database service or an npm SQLite driver.
-Persistence/retention are still decisions for round 4, not accepted architecture.
+Persistence/retention were subsequently accepted in round 4 and recorded in ADR
+0006.

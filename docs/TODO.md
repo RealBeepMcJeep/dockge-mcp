@@ -14,6 +14,11 @@
 
 ## Verification before a supported deployment
 
+- Choose the public GitHub owner and source/mirror direction; configure GitHub
+  access and automatic builds/releases. Make GHCR package public and verify
+  anonymous pulls after first publication. See publishing.md.
+- Verify compiled x64/arm64 executables and multi-platform image through public
+  CI, with no production Dockge credentials.
 - Verify the TypeScript MCP SDK's legacy Streamable HTTP behavior and official
   Socket.IO client's ACK/event/reconnect handling under the selected Bun runtime.
 - Verify environment read/write permission isolation and preservation of `.env`

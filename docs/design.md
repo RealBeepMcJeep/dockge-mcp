@@ -1,6 +1,6 @@
 # Design interview
 
-Status: round 3 answers recorded (2026-09-30); round 4 awaiting answers. Unanswered
+Status: round 4 accepted (2026-09-30); GitHub publishing adds two open questions. Unanswered
 recommendations remain proposals. The invoked `grill-with-docs` skill combines an interview
 with glossary and ADR updates. Implementation begins after shared understanding
 is confirmed; repository creation and research were separately authorized.
@@ -13,8 +13,9 @@ is confirmed; repository creation and research were separately authorized.
 - Review current official MCP server guidance.
 - Conduct the design interview and record resolved terminology and decisions.
 
-The repository starts private, matching the organization visibility. Public
-distribution and licensing remain open.
+The Gitea repository starts private, matching the organization visibility.
+MIT licensing, public GitHub Actions builds, and GHCR distribution are now
+accepted. GitHub ownership and source/mirror direction remain open.
 
 ## Round 1: accepted
 
@@ -36,7 +37,7 @@ distribution and licensing remain open.
 | Q9: Faithful Dockge lifecycle semantics or custom behavior? | Separate save/deploy/stop/down/delete; update stopped stacks only pulls; return CLI completion separately from readiness. | Accepted: faithful. |
 | Q10: Trusted shared service identity or per-person/multi-tenant identities? | One trusted deployment identity with configurable capabilities/targets; document the trust boundary. | Accepted: keep initial access model simple; deferred work/testing goes to TODO. |
 | Q11: Editor contract? | Complete document replacement with a required last-read content hash; omitted environment is preserved, with best-effort conflict detection and no claim of atomic concurrency protection. | Accepted |
-| Q12: Runtime/distribution/license? | TypeScript on supported Node LTS, container-first packaging, npm entrypoint, MIT license. | Owner selected JavaScript/TypeScript with Bun after Rust research. License remains unconfirmed. |
+| Q12: Runtime/distribution/license? | TypeScript on supported Node LTS, container-first packaging, npm entrypoint, MIT license. | Owner selected JavaScript/TypeScript with Bun after Rust research. MIT accepted in round 4. |
 | Q13: Supported Dockge/MCP baseline? | Released Dockge 1.5.0 with an explicit profile; MCP 2025-11-25 for the current hub. Add other profiles/protocols after testing. | Accepted; owner reports live Dockge displays 1.5.0. SDK implementation depends on Q12. |
 
 Release comparison found that tag `1.5.0` persists `.env`, while reviewed master
@@ -51,7 +52,7 @@ upstream UI edit after preflight remains possible.
 | Question | Recommendation | Owner's answer |
 | --- | --- | --- |
 | Q8 follow-up: unsupported feature versus unknown result? | Known unavailable features fail before dispatch; lost mutation responses remain unknown and are reconciled, never blindly retried. See unsupported-scenarios.md. | Accepted |
-| Q12 follow-up: Rust versus TypeScript? | Rust binary plus Docker wrapper, subject to an initial Socket.IO/HTTP/static-packaging validation milestone. MIT remains proposed. See research/runtime.md. | Owner selected JavaScript/TypeScript with Bun; use TypeScript as a routine implementation choice. No Rust implementation. MIT still unconfirmed. |
+| Q12 follow-up: Rust versus TypeScript? | Rust binary plus Docker wrapper, subject to an initial Socket.IO/HTTP/static-packaging validation milestone. MIT remains proposed. See research/runtime.md. | Owner selected JavaScript/TypeScript with Bun; use TypeScript as a routine implementation choice. No Rust implementation. MIT accepted in round 4. |
 | Q14: Slow operations: blocking calls or operation handles? | Mutations return an operation handle; operation_status/operation_logs report command completion independently of request lifetime. | Accepted |
 | Q15: Overlapping operations on a stack? | One mutation at a time per agent/stack; reject busy requests instead of silently queuing stale actions. | Accepted |
 | Q16: Initial authentication/network boundary? | Private hub-reachable HTTP listener, one MCP bearer key, separately configured Dockge credentials. No per-person identity machinery initially. | Accepted |
@@ -75,19 +76,32 @@ YAML or application logs. Environment content must not leak through operation
 results, audit messages, or diagnostics.
 
 Requests for logs remain observational; interactive shell/exec is deferred.
-Operation retention/restart recovery will be decided after Q14. Authentication
+Operation retention/restart recovery was accepted in round 4. Authentication
 details and live-profile verification still require the configured Dockge URL;
 credentials should be supplied through configuration, not pasted into the chat.
 
-## Round 4: current frontier
+## Round 4: accepted
 
 | Question | Recommendation | Owner's answer |
 | --- | --- | --- |
-| Q18: Environment permission defaults? | `env_read` and `env_write` are independent, both disabled until configured; env-write can be enabled without env-read. | Pending |
-| Q19: Operation persistence/recovery? | Bun SQLite ledger, bounded sanitized output retained 24h; interrupted operations become unknown and retain their stack guard until reconciled or explicitly cleared. No replay. | Pending |
-| Q20: Environment write applies immediately or saves only? | Save only; deploy/start is a separate operation for Compose to apply changes. Ordinary restart does not apply changed configuration. | Pending |
-| Q21: Distribution artifacts? | Docker image first, plus a compiled Bun executable; initially test Linux x64/arm64. | Pending |
-| Q22: License? | MIT. Runtime changes did not settle the earlier license question. | Pending |
+| Q18: Environment permission defaults? | `env_read` and `env_write` are independent, both disabled until configured; env-write can be enabled without env-read. | Accepted |
+| Q19: Operation persistence/recovery? | Bun SQLite ledger, bounded sanitized output retained 24h; interrupted operations become unknown and retain their stack guard until reconciled or explicitly cleared. No replay. | Accepted |
+| Q20: Environment write applies immediately or saves only? | Save only; deploy/start is a separate operation for Compose to apply changes. Ordinary restart does not apply changed configuration. | Accepted |
+| Q21: Distribution artifacts? | Docker image first, plus a compiled Bun executable; initially test Linux x64/arm64. | Accepted; add public GitHub Actions automatic builds and GHCR publishing. |
+| Q22: License? | MIT. Runtime changes did not settle the earlier license question. | Accepted |
+
+## GitHub publishing frontier
+
+| Question | Recommendation | Owner's answer |
+| --- | --- | --- |
+| GitHub owner for public dockge-mcp and GHCR namespace? | Use the owner's chosen GitHub user/organization; do not infer it from Gitea's organization name. | Pending |
+| Source of truth and mirror direction? | Gitea remains development source; one-way push mirror to public GitHub for Actions/releases. | Pending |
+
+Configured GitHub credentials and a GitHub CLI were unavailable during read-only
+discovery. Repository/workflow preparation can proceed locally after the final
+design confirmation; publishing/mirror setup needs the chosen owner and GitHub
+access. Use CI's repository-scoped GITHUB_TOKEN for GHCR, not a permanent Docker
+registry token. Exact release policy is documented in publishing.md.
 
 The reviewable tool inventory and accepted semantics are in `contract.md`.
 After this round, summarize the settled design and seek the skill's final shared-
@@ -98,10 +112,10 @@ Read-only research is checking actual hub/client compatibility and Dockge releas
 behavior. The configured `/mcp/paseo-pi` route negotiated MCP 2025-11-25 even when
 2026-07-28 was requested. No primary Dockge URL was discoverable in available
 workspace/configuration, so live Dockge compatibility still requires its URL.
-Questions that depend on remaining facts stay deferred. Later rounds
-will settle downstream authentication, HTTP exposure, operation recovery,
-output limits/secret handling, shell sharing/session behavior, and acceptance
-criteria once their prerequisites are answered.
+Live configuration/verification remains acceptance work. Architecture decisions
+are settled except for the GitHub publishing frontier; shell sharing and advanced
+per-person access stay deferred. Reversible implementation defaults for timeouts,
+payload bounds, and naming will be documented during implementation.
 
 ## Design tree
 
@@ -129,12 +143,9 @@ flowchart TD
   Access --> Isolation[Caller and target isolation]
 ```
 
-Later rounds will resolve each branch once its prerequisites are answered. Concrete
-scenarios to examine include two agents with the same stack name, edits racing the
-UI, a lost connection during an update, a stopped stack being updated, services
-with multiple replicas, images without bash, and a failed deploy after files were
-already saved. Upstream source findings may make some proposed tools unsupported
-without an upstream fix or a deliberately broader backend.
+Acceptance scenarios include duplicate stack names across agents, UI edits racing
+MCP edits, lost update responses, stopped-stack updates, and a failed deploy after
+files were saved. Shared shells and replica-targeted execution are deferred.
 
 Accepted architectural trade-offs are recorded in `docs/adr/`. Record additional
 ADRs only for significant resolved trade-offs; do not turn every implementation
