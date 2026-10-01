@@ -1,6 +1,6 @@
 # Implementation plan
 
-Initial implementation is underway under the accepted design. Gitea and its
+Initial implementation and public CI passed under the accepted design. Gitea and its
 public GitHub mirror are configured; no mirror PAT is needed in the workspace.
 See verification.md for completion evidence. Live homelab access is deferred.
 

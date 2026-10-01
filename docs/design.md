@@ -1,6 +1,6 @@
 # Design interview
 
-Status: accepted design; initial implementation underway (2026-09-30). The
+Status: accepted design; initial implementation and public CI passed (2026-09-30). The
 owner completed the interview, configured the source mirror and instructed the
 next work. The invoked grill-with-docs workflow recorded the glossary and ADRs.
 

@@ -83,7 +83,8 @@ GitHub credential stored in Gitea. It is not exposed to this workspace or CI.
 GitHub Actions uses its generated GITHUB_TOKEN for publication; no permanent
 registry token or additional GitHub token is needed here.
 
-After the first successful image push, the owner may need to set the GHCR
-package to Public. The workflow warns when anonymous manifest access fails.
-See verification.md for build evidence. Live homelab URL/credentials remain
+The first successful image push is public, with independently verified anonymous
+manifest access; no visibility change is currently needed. The workflow warns
+when anonymous manifest access fails. See verification.md for build evidence.
+Live homelab URL/credentials remain
 separate runtime configuration and are never needed for public CI.
