@@ -1,17 +1,15 @@
 # Implementation plan
 
-Architecture is settled; the invoked grilling workflow requires one final
-shared-understanding confirmation before implementation. This plan makes the
-next work concrete and reviewable. GitHub credentials and the live Dockge URL
-can be configured later; they do not prevent local implementation/fixture tests.
+Initial implementation is underway under the accepted design. Gitea and its
+public GitHub mirror are configured; no mirror PAT is needed in the workspace.
+See verification.md for completion evidence. Live homelab access is deferred.
 
 ## Confirmed execution constraints
 
 The owner cannot provide live Dockge access now. This workspace has no Docker or
 Podman executable, Docker socket, or configured Docker host. Node/npm and Gitea
 access are available; Bun can be installed for local implementation. Public npm
-metadata and Bun release downloads are reachable. GitHub credentials are not yet
-configured.
+metadata and Bun release downloads are reachable. GitHub Actions can build from the configured public mirror.
 
 Validate locally using source-pinned Socket.IO fixtures, real MCP clients, and
 fault injection for ACK ordering/loss, reconnects, permissions, revision races,
@@ -66,10 +64,9 @@ tests. Exact homelab compatibility remains a later deployment check.
 - Verify mutations against disposable stacks. Production stacks are not test
   fixtures. Deployment is a separate action from creating build/release artifacts.
 
-GitHub access blocks repository creation/mirror activation/public CI/publication,
-not local implementation or preparing the workflows. GHCR publishing inside
-Actions uses its generated GITHUB_TOKEN; the external mirror credential is a
-separate credential supplied later through configuration.
+Repository creation and push mirroring are complete. GHCR publishing uses
+Actions-generated GITHUB_TOKEN; first-publication package visibility may still
+need owner configuration. No production credentials are required for CI.
 
 ## Completion evidence
 

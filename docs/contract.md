@@ -1,7 +1,7 @@
 # Initial tool contract
 
-Design contract on 2026-09-30. Architecture is settled; final shared-understanding
-confirmation is pending. No tools are implemented yet.
+Implementation contract on 2026-09-30. The initial 24 tools are implemented.
+See verification.md for completed checks and remaining deployment validation.
 
 ## Baseline and targets
 
@@ -101,5 +101,6 @@ stacks are not integration-test fixtures.
 MIT license. Build a Docker image and compiled Bun executables for Linux x64 and
 arm64. Gitea is authoritative with a public mirror at
 `realbeepmcjeep/dockge-mcp`. GitHub Actions publishes to
-`ghcr.io/realbeepmcjeep/dockge-mcp`; credentials will be configured later.
+`ghcr.io/realbeepmcjeep/dockge-mcp`. The source mirror is configured; Actions
+uses its generated GITHUB_TOKEN, without sharing the mirror PAT with the bridge.
 See publishing.md for the release policy.

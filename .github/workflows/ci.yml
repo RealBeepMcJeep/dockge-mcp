@@ -1,0 +1,209 @@
+name: Validate and publish
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dockge-mcp-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun test
+      - name: Validate release tags
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          bun -e 'const tag = process.env.RELEASE_TAG; const v = (await import("./package.json")).default.version; if (!/^v\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(tag) || tag.slice(1) !== v) throw new Error("Release tag must be SemVer matching package.json");'
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - name: Compile native binary
+        env:
+          BUILD_ARCH: ${{ matrix.arch }}
+        run: bun build --compile src/index.ts --outfile "dist/dockge-mcp-linux-$BUILD_ARCH"
+      - name: Smoke native binary with real HTTP MCP client
+        env:
+          BUILD_ARCH: ${{ matrix.arch }}
+          DOCKGE_URL: http://127.0.0.1:1
+          DOCKGE_USERNAME: fixture
+          DOCKGE_PASSWORD: fixture
+          MCP_BEARER_TOKEN: ci-artifact-smoke-token-with-at-least-32-characters
+          STATE_DIR: /tmp/dockge-mcp-binary-state
+        run: |
+          "./dist/dockge-mcp-linux-$BUILD_ARCH" &
+          artifact_pid=$!
+          trap 'kill "$artifact_pid" 2>/dev/null || true' EXIT
+          bun scripts/smoke.ts
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Build native image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          load: true
+          tags: dockge-mcp:ci
+          cache-from: type=gha,scope=validate-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=validate-${{ matrix.arch }}
+      - name: Smoke nonroot image with persistent state and real HTTP MCP client
+        env:
+          MCP_BEARER_TOKEN: ci-artifact-smoke-token-with-at-least-32-characters
+        run: |
+          docker volume create dockge-mcp-ci-data
+          docker run -d --name dockge-mcp-ci --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges \
+            -p 3000:3000 -v dockge-mcp-ci-data:/data -e DOCKGE_URL=http://127.0.0.1:1 \
+            -e DOCKGE_USERNAME=fixture -e DOCKGE_PASSWORD=fixture -e MCP_BEARER_TOKEN dockge-mcp:ci
+          trap 'docker logs dockge-mcp-ci; docker rm -f dockge-mcp-ci; docker volume rm dockge-mcp-ci-data' EXIT
+          bun scripts/smoke.ts
+          docker restart dockge-mcp-ci
+          bun scripts/smoke.ts
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dockge-mcp-linux-${{ matrix.arch }}
+          path: dist/dockge-mcp-linux-${{ matrix.arch }}
+          retention-days: 14
+          if-no-files-found: error
+
+  upstream:
+    name: Actual Dockge 1.5.0
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - name: Start disposable Dockge release with runner Docker
+        run: |
+          fixture_root=$(mktemp -d /tmp/dockge-mcp-upstream.XXXXXX)
+          mkdir -p "$fixture_root/data" "$fixture_root/stacks"
+          docker pull alpine:3.21@sha256:ce64758a109eb420d874a118f87920e625e12d3634e03b4a5573fd9f6e5d3507
+          docker run -d --name dockge-release-fixture -p 5001:5001 \
+            -v /var/run/docker.sock:/var/run/docker.sock -v "$fixture_root/data:/app/data" \
+            -v "$fixture_root/stacks:$fixture_root/stacks" -e "DOCKGE_STACKS_DIR=$fixture_root/stacks" \
+            louislam/dockge:1.5.0@sha256:335c6368b880ecc203236ed89e6e5232e0d6578e8ef5920e4a502390451502bf
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:5001/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          docker logs dockge-release-fixture
+          exit 1
+      - name: Exercise actual upstream through MCP
+        env:
+          DOCKGE_TEST_URL: http://127.0.0.1:5001
+        run: bun scripts/upstream.ts
+      - name: Fixture diagnostics and cleanup
+        if: always()
+        run: |
+          docker logs dockge-release-fixture || true
+          docker rm -f dockge-release-fixture || true
+
+  publish:
+    name: Publish multi-platform image
+    needs: [validate, upstream]
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: metadata
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+        with:
+          images: ghcr.io/realbeepmcjeep/dockge-mcp
+          flavor: latest=false
+          tags: |
+            type=raw,value=dev,enable={{is_default_branch}}
+            type=sha,prefix=sha-,format=long
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-') }}
+      - id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+          build-args: |
+            BUILD_COMMIT=${{ github.sha }}
+            BUILD_TIME=${{ steps.metadata.outputs.labels && fromJSON(steps.metadata.outputs.json).labels['org.opencontainers.image.created'] }}
+            BUILD_VERSION=${{ steps.metadata.outputs.version }}
+          cache-from: type=gha,scope=publish
+          cache-to: type=gha,mode=max,scope=publish
+      - name: Verify published manifest
+        env:
+          PUBLISHED_DIGEST: ${{ steps.build.outputs.digest }}
+        run: docker buildx imagetools inspect "ghcr.io/realbeepmcjeep/dockge-mcp@$PUBLISHED_DIGEST"
+      - name: Check anonymous registry access
+        run: |
+          anonymous_config=$(mktemp -d)
+          if ! DOCKER_CONFIG="$anonymous_config" docker manifest inspect "ghcr.io/realbeepmcjeep/dockge-mcp:sha-$GITHUB_SHA" >/dev/null; then
+            echo '::warning::Set the new dockge-mcp GHCR package visibility to Public, then verify an anonymous pull. GitHub defaults new packages to private.'
+          fi
+          rm -rf "$anonymous_config"
+
+  release:
+    name: Release compiled executables
+    needs: [validate, upstream, publish]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: dockge-mcp-linux-*
+          merge-multiple: true
+          path: dist
+      - name: Publish binaries and checksums
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cd dist
+          chmod +x dockge-mcp-linux-*
+          sha256sum dockge-mcp-linux-* > SHA256SUMS
+          release_options=()
+          if [[ "$RELEASE_TAG" == *-* ]]; then release_options+=(--prerelease); fi
+          gh release create "$RELEASE_TAG" dockge-mcp-linux-* SHA256SUMS --verify-tag --title "$RELEASE_TAG" --generate-notes "${release_options[@]}"

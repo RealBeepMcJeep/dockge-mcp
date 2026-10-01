@@ -14,9 +14,8 @@
 
 ## Verification before a supported deployment
 
-- Configure GitHub access for `realbeepmcjeep/dockge-mcp`, a one-way Gitea push
-  mirror, and automatic builds/releases. Make GHCR package public and verify
-  anonymous pulls after first publication. See publishing.md.
+- Gitea/GitHub source mirroring is complete. Make the new GHCR package public
+  and verify anonymous pulls after first publication. See publishing.md.
 - Verify compiled x64/arm64 executables and multi-platform image through public
   CI, with no production Dockge credentials.
 - Run actual Dockge 1.5.0/Docker integration on disposable GitHub Ubuntu runners;

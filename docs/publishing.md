@@ -3,8 +3,9 @@
 The owner accepted Docker plus compiled Bun executables for Linux x64/arm64,
 MIT licensing, and public GitHub Actions automatic builds/publishing to GHCR.
 The public GitHub owner is `realbeepmcjeep`; Gitea remains authoritative with a
-one-way public GitHub push mirror. GitHub credentials will be supplied later.
-No GitHub repository, workflow, release, or package has been created yet.
+one-way public GitHub push mirror. Both repositories and the source mirror are
+configured. The implemented workflow is .github/workflows/ci.yml; publication
+is gated on native artifact and actual disposable Dockge integration checks.
 
 ## Destinations
 
@@ -32,7 +33,7 @@ need to reach private Gitea or Dockge; source is pushed outward to GitHub.
 Do not configure bidirectional mirroring. GitHub contributions must be brought
 into the Gitea source before mirroring, rather than merged only in GitHub.
 
-## Proposed build/release policy
+## Build/release policy
 
 The owner's [public build examples](research/public-build-examples.md) provide
 CI gating, Buildx caching, build metadata, MCP smoke, and anonymous-visibility
@@ -77,16 +78,12 @@ operation ledger, raw environment files, and logs are never release artifacts.
 
 ## Current prerequisites
 
-No usable GitHub credentials or GitHub CLI were found in read-only local
-discovery; the owner will configure access later. Implementation/workflow
-preparation can proceed locally after shared understanding is confirmed, while
-GitHub publication requires configured access. The Gitea repository and accepted
-design records are already committed.
+Gitea push-on-commit mirroring is configured using the owner's repository-scoped
+GitHub credential stored in Gitea. It is not exposed to this workspace or CI.
+GitHub Actions uses its generated GITHUB_TOKEN for publication; no permanent
+registry token or additional GitHub token is needed here.
 
-The documented classic-PAT mirror setup uses `public_repo` and `workflow`
-scopes, distinct from the Actions-generated registry publishing token. Supply
-the external credential through configuration (for example GH_TOKEN for setup),
-not through repository content. Local implementation can proceed before this
-credential is available. GitHub Ubuntu runners provide the Docker-capable
-environment for real disposable upstream/image tests that this workspace lacks;
-see [Docker service container guidance](https://docs.github.com/en/actions/tutorials/use-containerized-services/use-docker-service-containers).
+After the first successful image push, the owner may need to set the GHCR
+package to Public. The workflow warns when anonymous manifest access fails.
+See verification.md for build evidence. Live homelab URL/credentials remain
+separate runtime configuration and are never needed for public CI.

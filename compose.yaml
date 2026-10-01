@@ -1,0 +1,22 @@
+services:
+  dockge-mcp:
+    image: ghcr.io/realbeepmcjeep/dockge-mcp:dev
+    # For a local source build: docker compose build
+    build: .
+    env_file: .env
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - dockge-mcp-data:/data
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  dockge-mcp-data:

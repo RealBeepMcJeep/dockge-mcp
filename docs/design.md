@@ -1,9 +1,8 @@
 # Design interview
 
-Status: architectural interview settled (2026-09-30); final shared-understanding
-confirmation pending. The invoked `grill-with-docs` skill combines an interview
-with glossary and ADR updates. Implementation begins after shared understanding
-is confirmed; repository creation and research were separately authorized.
+Status: accepted design; initial implementation underway (2026-09-30). The
+owner completed the interview, configured the source mirror and instructed the
+next work. The invoked grill-with-docs workflow recorded the glossary and ADRs.
 
 ## Authorized and completed
 
@@ -98,16 +97,9 @@ credentials should be supplied through configuration, not pasted into the chat.
 | GitHub owner for public dockge-mcp and GHCR namespace? | Use the owner's chosen GitHub user/organization; do not infer it from Gitea's organization name. | realbeepmcjeep |
 | Source of truth and mirror direction? | Gitea remains development source; one-way push mirror to public GitHub for Actions/releases. | Accepted |
 
-Configured GitHub credentials and a GitHub CLI were unavailable during read-only
-discovery. Repository/workflow preparation can proceed locally after the final
-design confirmation; publishing/mirror setup needs GitHub access, which the owner
-will supply later. Use CI's repository-scoped GITHUB_TOKEN for GHCR, not a permanent Docker
-registry token. Exact release policy is documented in publishing.md.
-
-The reviewable tool inventory and accepted semantics are in `contract.md`.
-Summarize the settled design and seek the skill's final shared-understanding
-confirmation. Do not expand this into another round for routine
-reversible implementation defaults unless a material issue emerges.
+The public GitHub repository and one-way Gitea push mirror are configured.
+The bridge never receives the mirror PAT. The reviewable tool inventory and
+accepted semantics are in contract.md; build/release policy is in publishing.md.
 
 Read-only research is checking actual hub/client compatibility and Dockge release
 behavior. The configured `/mcp/paseo-pi` route negotiated MCP 2025-11-25 even when

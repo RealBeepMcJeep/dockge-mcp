@@ -5,5 +5,5 @@ push mirror to `realbeepmcjeep/dockge-mcp` for GitHub Actions builds and release
 Publish Docker images to `ghcr.io/realbeepmcjeep/dockge-mcp` and Linux x64/arm64
 binary release assets. This combines the chosen Gitea development home with
 public build infrastructure, at the cost of mirror setup and requiring all
-source changes to reach Gitea before synchronization; GitHub credentials will
-be configured later.
+source changes to reach Gitea before synchronization. The owner has configured
+the one-way push mirror; its credential remains in Gitea.
