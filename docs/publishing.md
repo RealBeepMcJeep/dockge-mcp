@@ -82,3 +82,11 @@ discovery; the owner will configure access later. Implementation/workflow
 preparation can proceed locally after shared understanding is confirmed, while
 GitHub publication requires configured access. The Gitea repository and accepted
 design records are already committed.
+
+The documented classic-PAT mirror setup uses `public_repo` and `workflow`
+scopes, distinct from the Actions-generated registry publishing token. Supply
+the external credential through configuration (for example GH_TOKEN for setup),
+not through repository content. Local implementation can proceed before this
+credential is available. GitHub Ubuntu runners provide the Docker-capable
+environment for real disposable upstream/image tests that this workspace lacks;
+see [Docker service container guidance](https://docs.github.com/en/actions/tutorials/use-containerized-services/use-docker-service-containers).

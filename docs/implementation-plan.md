@@ -5,6 +5,22 @@ shared-understanding confirmation before implementation. This plan makes the
 next work concrete and reviewable. GitHub credentials and the live Dockge URL
 can be configured later; they do not prevent local implementation/fixture tests.
 
+## Confirmed execution constraints
+
+The owner cannot provide live Dockge access now. This workspace has no Docker or
+Podman executable, Docker socket, or configured Docker host. Node/npm and Gitea
+access are available; Bun can be installed for local implementation. Public npm
+metadata and Bun release downloads are reachable. GitHub credentials are not yet
+configured.
+
+Validate locally using source-pinned Socket.IO fixtures, real MCP clients, and
+fault injection for ACK ordering/loss, reconnects, permissions, revision races,
+and durable recovery. This verifies the adapter contract and logic, not actual
+Docker/Compose behavior. After GitHub access is configured, Ubuntu Actions jobs
+can run disposable Dockge 1.5.0 with a Docker engine for actual upstream
+integration and image checks. No production Dockge access is needed for those
+tests. Exact homelab compatibility remains a later deployment check.
+
 ## 1. Runtime and protocol foundation
 
 - Scaffold TypeScript/Bun with pinned SDK v1 and official Socket.IO client,
@@ -49,6 +65,11 @@ can be configured later; they do not prevent local implementation/fixture tests.
   registered-agent discovery, and read-only calls through the homelab hub.
 - Verify mutations against disposable stacks. Production stacks are not test
   fixtures. Deployment is a separate action from creating build/release artifacts.
+
+GitHub access blocks repository creation/mirror activation/public CI/publication,
+not local implementation or preparing the workflows. GHCR publishing inside
+Actions uses its generated GITHUB_TOKEN; the external mirror credential is a
+separate credential supplied later through configuration.
 
 ## Completion evidence
 
